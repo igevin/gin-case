@@ -17,6 +17,24 @@ func main() {
 	r.GET("/message", func(c *gin.Context) {
 		c.String(http.StatusOK, "hello, now is %v ", time.Now().Format("2006-01-02 15:04:05"))
 	})
+	// JSON 使用 unicode 替换特殊 HTML 字符，例如 < 变为 \ u003c
+	// 提供 unicode 实体
+	r.GET("/json", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"html": "<b>Hello, world!</b>",
+		})
+	})
+
+	// 如果要按字面对特殊 HTML 字符进行编码，则可以使用 PureJSON。Go 1.6 及更低版本无法使用此功能
+	// 提供字面字符
+	r.GET("/purejson", func(c *gin.Context) {
+		c.PureJSON(200, gin.H{
+			"html": "<b>Hello, world!</b>",
+		})
+	})
+
+	secureJson(r)
+
 	// 获取URL中的变量
 	r.GET("/user/:name/:role", func(c *gin.Context) {
 		name := c.Param("name")
@@ -71,4 +89,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func secureJson(r *gin.Engine) {
+	// 可以使用自己的 SecureJSON 前缀，默认预设值为"while(1),"
+	prefix := ")(}{][,.\n"
+	// prefix 随便设置，这里简化一下
+	prefix = ")(}{][,."
+	r.SecureJsonPrefix(prefix)
+
+	r.GET("/secure-json", func(c *gin.Context) {
+		names := []string{"lena", "austin", "foo"}
+		// 这样没有效果
+		//c.SecureJSON(http.StatusOK, gin.H{"names": names})
+		// 输出 )(}{][,.["lena","austin","foo"]
+		c.SecureJSON(http.StatusOK, names)
+	})
 }
