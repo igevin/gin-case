@@ -6,8 +6,7 @@ import (
 	"time"
 )
 
-func main() {
-	r := gin.Default()
+func basic(r *gin.Engine) {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
@@ -17,6 +16,9 @@ func main() {
 	r.GET("/message", func(c *gin.Context) {
 		c.String(http.StatusOK, "hello, now is %v ", time.Now().Format("2006-01-02 15:04:05"))
 	})
+}
+
+func json(r *gin.Engine) {
 	// JSON 使用 unicode 替换特殊 HTML 字符，例如 < 变为 \ u003c
 	// 提供 unicode 实体
 	r.GET("/json", func(c *gin.Context) {
@@ -32,9 +34,25 @@ func main() {
 			"html": "<b>Hello, world!</b>",
 		})
 	})
+}
 
-	secureJson(r)
+func secureJson(r *gin.Engine) {
+	// 可以使用自己的 SecureJSON 前缀，默认预设值为"while(1),"
+	prefix := ")(}{][,.\n"
+	// prefix 随便设置，这里简化一下
+	prefix = ")(}{][,."
+	r.SecureJsonPrefix(prefix)
 
+	r.GET("/secure-json", func(c *gin.Context) {
+		names := []string{"lena", "austin", "foo"}
+		// 这样没有效果
+		//c.SecureJSON(http.StatusOK, gin.H{"names": names})
+		// 输出 )(}{][,.["lena","austin","foo"]
+		c.SecureJSON(http.StatusOK, names)
+	})
+}
+
+func urlRequestHandle(r *gin.Engine) {
 	// 获取URL中的变量
 	r.GET("/user/:name/:role", func(c *gin.Context) {
 		name := c.Param("name")
@@ -66,6 +84,9 @@ func main() {
 		ids := c.QueryMap("ids")
 		c.JSON(http.StatusOK, ids)
 	})
+}
+
+func customResponse(r *gin.Engine) {
 	r.GET("custom1", func(c *gin.Context) {
 		c.Header("key1", "value1")
 		c.String(http.StatusNotFound, "404 not found")
@@ -84,25 +105,8 @@ func main() {
 		c.Writer.WriteHeader(http.StatusNotFound)
 		_, _ = c.Writer.Write([]byte("404 not found"))
 	})
-
-	err := r.Run(":8080")
-	if err != nil {
-		panic(err)
-	}
 }
 
-func secureJson(r *gin.Engine) {
-	// 可以使用自己的 SecureJSON 前缀，默认预设值为"while(1),"
-	prefix := ")(}{][,.\n"
-	// prefix 随便设置，这里简化一下
-	prefix = ")(}{][,."
-	r.SecureJsonPrefix(prefix)
+func defaultHandler(r *gin.Engine) {
 
-	r.GET("/secure-json", func(c *gin.Context) {
-		names := []string{"lena", "austin", "foo"}
-		// 这样没有效果
-		//c.SecureJSON(http.StatusOK, gin.H{"names": names})
-		// 输出 )(}{][,.["lena","austin","foo"]
-		c.SecureJSON(http.StatusOK, names)
-	})
 }
