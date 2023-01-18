@@ -163,6 +163,40 @@ func HandlePost(r *gin.Engine) {
 		})
 	})
 
+	// curl -X "POST" "http://localhost:8080/post/form/array" \
+	//     -H 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' \
+	//     --data-urlencode "id=1,2" \
+	//     --data-urlencode "name=tom,jerry"
+	r.POST("/post/form/array", func(c *gin.Context) {
+		ids := c.PostFormArray("id")
+		names := c.PostFormArray("name")
+		if len(ids) != len(names) {
+			c.String(http.StatusBadRequest, "bad request")
+			return
+		}
+		type user struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		}
+		data := make([]user, 0, len(ids))
+		for i := 0; i < len(ids); i++ {
+			data = append(data, user{
+				Id:   ids[i],
+				Name: names[i],
+			})
+		}
+		c.JSON(http.StatusOK, data)
+	})
+
+	// curl -X "POST" "http://localhost:8080/post/form/map" \
+	//     -H 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' \
+	//     --data-urlencode "ids[1]=Tom" \
+	//     --data-urlencode "ids[2]=Jerry"
+	r.POST("/post/form/map", func(c *gin.Context) {
+		ids := c.PostFormMap("ids")
+		c.JSON(http.StatusOK, ids)
+	})
+
 	r.POST("/post/json", func(c *gin.Context) {
 		person := &struct {
 			Name string `json:"name"`
