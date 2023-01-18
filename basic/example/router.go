@@ -230,6 +230,17 @@ func HandlePost(r *gin.Engine) {
 	})
 }
 
+func handleRedirect(r *gin.Engine) {
+	r.GET("/redirect", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/ping")
+	})
+
+	r.GET("/goto/message", func(c *gin.Context) {
+		c.Request.URL.Path = "/message"
+		r.HandleContext(c)
+	})
+}
+
 func defaultHandler(r *gin.Engine) {
 
 }

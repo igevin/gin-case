@@ -14,6 +14,7 @@ func main() {
 	customResponse(r)
 	renderData(r)
 	HandlePost(r)
+	handleRedirect(r)
 	defaultHandler(r)
 
 	err := r.Run(":8080")
