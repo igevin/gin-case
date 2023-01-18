@@ -15,6 +15,7 @@ func main() {
 	renderData(r)
 	HandlePost(r)
 	handleRedirect(r)
+	groupUrl(r)
 	defaultHandler(r)
 
 	err := r.Run(":8080")

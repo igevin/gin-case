@@ -241,6 +241,23 @@ func handleRedirect(r *gin.Engine) {
 	})
 }
 
+func groupUrl(r *gin.Engine) {
+	d := func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"path": c.FullPath(),
+		})
+	}
+	g1 := r.Group("/v1")
+	g2 := r.Group("/v2")
+	g1.GET("/posts", d)
+	g1.GET("/series", d)
+	g2.GET("/posts", d)
+	g2.GET("/series", d)
+	g11 := g1.Group("/fix")
+	g11.GET("/posts", d)
+	g11.GET("/series", d)
+}
+
 func defaultHandler(r *gin.Engine) {
 
 }
