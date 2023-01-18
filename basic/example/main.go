@@ -12,6 +12,7 @@ func main() {
 	secureJson(r)
 	urlRequestHandle(r)
 	customResponse(r)
+	renderData(r)
 	defaultHandler(r)
 
 	err := r.Run(":8080")
@@ -19,5 +20,3 @@ func main() {
 		panic(err)
 	}
 }
-
-
