@@ -8,11 +8,12 @@ func main() {
 	r := gin.Default()
 
 	basic(r)
-	json(r)
+	handleJson(r)
 	secureJson(r)
 	urlRequestHandle(r)
 	customResponse(r)
 	renderData(r)
+	HandlePost(r)
 	defaultHandler(r)
 
 	err := r.Run(":8080")

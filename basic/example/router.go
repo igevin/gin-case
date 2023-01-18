@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/testdata/protoexample"
 	"net/http"
@@ -19,7 +20,7 @@ func basic(r *gin.Engine) {
 	})
 }
 
-func json(r *gin.Engine) {
+func handleJson(r *gin.Engine) {
 	// JSON 使用 unicode 替换特殊 HTML 字符，例如 < 变为 \ u003c
 	// 提供 unicode 实体
 	r.GET("/json", func(c *gin.Context) {
@@ -116,7 +117,7 @@ func renderData(r *gin.Engine) {
 	r.GET("/moreJSON", func(c *gin.Context) {
 		// 你也可以使用一个结构体
 		var msg struct {
-			Name    string `json:"user"`
+			Name    string `handleJson:"user"`
 			Message string
 			Number  int
 		}
@@ -147,6 +148,51 @@ func renderData(r *gin.Engine) {
 		// 请注意，数据在响应中变为二进制数据
 		// 将输出被 protoexample.Test protobuf 序列化了的数据
 		c.ProtoBuf(http.StatusOK, data)
+	})
+}
+
+func HandlePost(r *gin.Engine) {
+	r.POST("/post/form", func(c *gin.Context) {
+		name := c.PostForm("name")
+		password := c.DefaultPostForm("pwd", "123456")
+		id := c.DefaultQuery("id", "1")
+		c.JSON(http.StatusOK, gin.H{
+			"id":       id,
+			"name":     name,
+			"password": password,
+		})
+	})
+
+	r.POST("/post/json", func(c *gin.Context) {
+		person := &struct {
+			Name string `json:"name"`
+			Age  int    `json:"age"`
+		}{}
+		err := c.BindJSON(person)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "internal server error")
+			return
+		}
+		c.JSON(http.StatusOK, person)
+	})
+
+	r.POST("/post/json2", func(c *gin.Context) {
+		bs, err := c.GetRawData()
+		if err != nil {
+			c.String(http.StatusBadRequest, "bad request")
+			return
+		}
+		type Person struct {
+			Name string `json:"name"`
+			Age  int    `json:"age"`
+		}
+		person := &Person{}
+		err = json.Unmarshal(bs, person)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "internal server error")
+			return
+		}
+		c.JSON(http.StatusOK, person)
 	})
 }
 
