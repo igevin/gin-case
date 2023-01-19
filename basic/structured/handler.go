@@ -7,7 +7,7 @@ import (
 
 func getVersion(c *gin.Context) {
 	version := "0.1"
-	c.String(http.StatusOK, "本系统版本为", version)
+	c.String(http.StatusOK, "本系统版本为%s", version)
 }
 
 func getInfo(c *gin.Context) {

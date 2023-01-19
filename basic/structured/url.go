@@ -17,8 +17,11 @@ func register(r gin.IRouter) {
 }
 
 func registerApi(r gin.IRouter) {
-	group1 := r.Group("/api/v1")
+	group1 := r.Group("/api/v1", func(c *gin.Context) {
+		c.Header("version", "v1")
+	})
 	group1.GET("/version", getApiVersion)
+	group1.GET("/apis", listApis)
 }
 
 func (s *Server) register() {
