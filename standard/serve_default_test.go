@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -56,6 +57,22 @@ func TestServeHttpResponseV2(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("api page"))
 	})
+
+	// 这个匹配 /admin 前缀的页面
+	http.HandleFunc("/admin/", func(w http.ResponseWriter, r *http.Request) {
+		s, err := json.Marshal(map[string]any{"success": true, "msg": "Welcome to admin page"})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Internal Server error"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Add("key", "value")
+		// 先设置 header，再write header
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(s)
+	})
+
 	err := http.ListenAndServe(":8080", nil)
 	assert.NoError(t, err)
 }
