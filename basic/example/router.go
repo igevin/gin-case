@@ -1,4 +1,4 @@
-package main
+package example
 
 import (
 	"encoding/json"
@@ -7,6 +7,19 @@ import (
 	"net/http"
 	"time"
 )
+
+func RegisterRoute(r *gin.Engine) {
+	basic(r)
+	handleJson(r)
+	secureJson(r)
+	urlRequestHandle(r)
+	customResponse(r)
+	renderData(r)
+	HandlePost(r)
+	handleRedirect(r)
+	groupUrl(r)
+	defaultHandler(r)
+}
 
 func basic(r *gin.Engine) {
 	r.GET("/ping", func(c *gin.Context) {
