@@ -14,7 +14,11 @@ func TestServer(t *testing.T) {
 }
 
 func startServer(engine *gin.Engine) error {
+	RegisterMetrics()
+	engine.Use(promMiddleware())
 	registerRoute(engine)
+	metrics(engine)
+
 	return engine.Run()
 
 }
